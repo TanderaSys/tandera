@@ -197,7 +197,8 @@ public class FrmMarkups extends FormularioConsulta {
 	private void exibirCadastro(Markup entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
 		frm.setEntidade(entidade);
-		this.exibir(frm);
+		this.dialogo(frm);
+		listar();
 	}
 
 }

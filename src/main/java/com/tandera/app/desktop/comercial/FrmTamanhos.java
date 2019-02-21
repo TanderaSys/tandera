@@ -193,7 +193,8 @@ public class FrmTamanhos extends FormularioConsulta {
 		private void exibirCadastro(Tamanho entidade) {
 			Formulario frm = SpringDesktopApp.getBean(FrmTamanho.class);
 			frm.setEntidade(entidade);
-			this.exibir(frm);
+			this.dialogo(frm);
+			listar();
 		}		
 		
 }

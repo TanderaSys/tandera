@@ -197,7 +197,8 @@ public class FrmEstados extends FormularioConsulta {
 	private void exibirCadastro(Estado entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
 		frm.setEntidade(entidade);
-		this.exibir(frm);
+		this.dialogo(frm);
+		listar();
 	}
 
 }

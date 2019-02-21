@@ -6,7 +6,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.util.regex.Pattern;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -21,7 +20,7 @@ import com.tandera.core.model.comercial.MascaraPreco;
 import com.tandera.core.util.Biblioteca;
 
 import edu.porgamdor.util.desktop.Formato;
-import edu.porgamdor.util.desktop.Formulario;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.SSBotao;
 import edu.porgamdor.util.desktop.ss.SSCampoNumero;
 import edu.porgamdor.util.desktop.ss.SSCampoTexto;
@@ -30,7 +29,7 @@ import edu.porgamdor.util.desktop.ss.evento.ValidacaoEvento;
 import edu.porgamdor.util.desktop.ss.evento.ValidacaoListener;
 
 @Component
-public class FrmMascaraPreco extends Formulario {
+public class FrmMascaraPreco extends FormularioCrud {
 
 	@Autowired
 	private MascaraPrecoRepository dao;
@@ -38,11 +37,9 @@ public class FrmMascaraPreco extends Formulario {
 	private MascaraPreco entidade;
 
 	private SSCampoTexto txtMascara = new SSCampoTexto();
-	
+
 	private SSCampoNumero txtValor = new SSCampoNumero();
 
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
 
 	public FrmMascaraPreco() {
@@ -69,13 +66,13 @@ public class FrmMascaraPreco extends Formulario {
 		gbcTxtMascara.fill = GridBagConstraints.HORIZONTAL;
 		gbcTxtMascara.gridx = 0;
 		gbcTxtMascara.gridy = 0;
-	
+
 		panelCampos.add(txtMascara, gbcTxtMascara);
 
 		txtMascara.setColunas(10);
 		txtMascara.setRotulo("Mascara");
 		txtMascara.setEditavel(false);
-		
+
 		GridBagConstraints gbcTxtValor = new GridBagConstraints();
 		gbcTxtValor.insets = new Insets(5, 5, 0, 5);
 		gbcTxtValor.fill = GridBagConstraints.BOTH;
@@ -87,28 +84,14 @@ public class FrmMascaraPreco extends Formulario {
 		txtValor.setObrigatorio(true);
 		panelCampos.add(txtValor, gbcTxtValor);
 
-		cmdSair.setText("Fechar");
-		cmdSalvar.setText("Salvar");
-
 		adicionarListner();
 	}
 
 	private void adicionarListner() {
-		// Listners = Comandos = Eventos
-		cmdSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				salvar();
-			}
-		});
-		cmdSair.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sair();
-			}
-		});
-		
+
 		// validaçao do campo mascara
-		txtValor.addValidacaoListener( new ValidacaoListener() {
-			
+		txtValor.addValidacaoListener(new ValidacaoListener() {
+
 			@Override
 			public void validacaoListener(ValidacaoEvento evento) {
 				criptografarValor();
@@ -126,18 +109,16 @@ public class FrmMascaraPreco extends Formulario {
 	}
 
 	private void criptografarValor() {
-		if(!txtValor.getText().trim().isEmpty()){
-			
-            String valor = txtValor.getText()
-            		               .replace(".", "")
-            		               .replace(",",".");
-            
-			txtMascara.setValue(Biblioteca.criptoBigDecimalToString(new BigDecimal(valor))); 
-		}else {
+		if (!txtValor.getText().trim().isEmpty()) {
+
+			String valor = txtValor.getText().replace(".", "").replace(",", ".");
+
+			txtMascara.setValue(Biblioteca.criptoBigDecimalToString(new BigDecimal(valor)));
+		} else {
 			txtMascara.setValue("");
 		}
 	}
-	
+
 	private void atribuir() {
 		try {
 			txtMascara.setValue(entidade.getMascara());
@@ -153,7 +134,7 @@ public class FrmMascaraPreco extends Formulario {
 		atribuir();
 	}
 
-	private void salvar() {
+	protected void salvar() {
 		try {
 
 			entidade.setMascara(txtMascara.getText());

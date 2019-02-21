@@ -10,11 +10,11 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -64,6 +64,7 @@ import com.tandera.core.util.Biblioteca;
 import com.tandera.core.util.Constantes;
 
 import edu.porgamdor.util.desktop.Formulario;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.PosicaoRotulo;
 import edu.porgamdor.util.desktop.ss.SSBotao;
 import edu.porgamdor.util.desktop.ss.SSCaixaCombinacao;
@@ -79,7 +80,7 @@ import edu.porgamdor.util.desktop.ss.evento.ValidacaoListener;
 
 @Component
 //@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class FrmCompra extends Formulario {
+public class FrmCompra extends FormularioCrud {
 
 	@Autowired
 	private CompraRepository compraRepository;
@@ -155,8 +156,6 @@ public class FrmCompra extends Formulario {
 	private SSBotao cmdAprovadoTroca = new SSBotao();
 	private SSBotao cmdReprovado = new SSBotao();
 	private SSBotao cmdEstorno = new SSBotao();
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
 	private JCheckBox chkNovoItem = new JCheckBox("Novo?");
 
@@ -750,7 +749,7 @@ public class FrmCompra extends Formulario {
 		atribuir();
 	}
 
-	private void salvar() {
+	protected void salvar() {
 		try {
 			if (this.acao.equals(Constantes.ACAO_EXCLUSAO)) {
 				compraRepository.saveAndFlush(compra);
@@ -921,10 +920,14 @@ public class FrmCompra extends Formulario {
 				listaDeItens.remove(this.itemCompraSelecionado);
 				listaDeItens.add(itemCompra);
 			}
-			this.compra.setItemCompra(listaDeItens);
-			tabela.setValue(listaDeItens);
+			//this.compra.setItemCompra(listaDeItens);
+			//tabela.setValue(listaDeItens);
 		}
 		// limpar campos de adicao/alteração de itens
+		this.compra.setItemCompra(listaDeItens);
+		listaDeItens = ordenaItens(listaDeItens);
+		tabela.setValue(listaDeItens);
+		
 		limparPainelInclusao();
 		calculaValorTotalOrcto();
 		//loadItens();
@@ -936,7 +939,7 @@ public class FrmCompra extends Formulario {
 		}
 	}
 
-	private List<ItemCompra> numeraItens(List<ItemCompra> lista) {
+	private synchronized List<ItemCompra> numeraItens(List<ItemCompra> lista) {
 		List<ItemCompra> listaRetorno = new ArrayList<ItemCompra>();
 		AtomicInteger contador = new AtomicInteger(1);
 		lista.forEach(item -> {
@@ -945,8 +948,21 @@ public class FrmCompra extends Formulario {
 		});
 		return listaRetorno;
 	}
-
-	private void limparPainelInclusao() {
+    
+	private List<ItemCompra> ordenaItens(List<ItemCompra> lista){
+		if (this.acao.equals(Constantes.ACAO_NOVO)) {
+		    lista.sort(Comparator.comparingInt(ItemCompra::getItem).reversed());
+		}
+		else {
+			lista.sort(Comparator.comparingInt(ItemCompra::getItem));
+		}
+		
+		
+		return lista;
+	}
+	
+	
+	private  void limparPainelInclusao() {
 		cboCategoria.setValue(null);
 		cboMascara.setValue(null);
 		cboMarca.setValue(null);
@@ -1267,6 +1283,7 @@ public class FrmCompra extends Formulario {
 			txtIdPessoa.setText(pessoa.getId().toString());
 			txtNome.setText(pessoa.getNome());
 			txtTelefone.setText(pessoa.getTelefone());
+			txtObs.setText("Dados Bancários: " + pessoa.getDados_bancarios());
 		}
 		return pessoa;
 	}

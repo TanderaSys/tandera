@@ -197,7 +197,8 @@ public class FrmTipos extends FormularioConsulta {
 	private void exibirCadastro(Tipo entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
 		frm.setEntidade(entidade);
-		this.exibir(frm);
+		this.dialogo(frm);
+		listar();
 	}
 
 }

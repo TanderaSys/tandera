@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 import com.tandera.core.dao.springjpa.EstadoRepository;
 import com.tandera.core.model.comercial.Estado;
 
-import edu.porgamdor.util.desktop.Formulario;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.SSBotao;
 import edu.porgamdor.util.desktop.ss.SSCampoTexto;
 import edu.porgamdor.util.desktop.ss.SSMensagem;
 
 @Component
-public class FrmEstado extends Formulario {
+public class FrmEstado extends FormularioCrud {
 
 	@Autowired
 	private EstadoRepository dao;
@@ -33,8 +33,6 @@ public class FrmEstado extends Formulario {
 	private SSCampoTexto txtDescr = new SSCampoTexto();
 	private SSCampoTexto txtSigla = new SSCampoTexto();
 
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
 
 	public FrmEstado() {
@@ -76,21 +74,6 @@ public class FrmEstado extends Formulario {
 		cmdSair.setText("Fechar");
 		cmdSalvar.setText("Salvar");
 
-		adicionarListner();
-	}
-
-	private void adicionarListner() {
-		// Listners = Comandos = Eventos
-		cmdSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				salvar();
-			}
-		});
-		cmdSair.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sair();
-			}
-		});
 	}
 
 	// public void setEntidade(Natureza entidade) {
@@ -117,7 +100,7 @@ public class FrmEstado extends Formulario {
 		atribuir();
 	}
 
-	private void salvar() {
+	protected void salvar() {
 		try {
 			entidade.setDescr(txtDescr.getText());
 			entidade.setSigla(txtSigla.getText());
@@ -127,11 +110,10 @@ public class FrmEstado extends Formulario {
 				SSMensagem.avisa("Dados incompletos");
 				return;
 			}
-
-			// dao.gravar(operacao, entidade);
+			
 			dao.save(entidade);
 
-			SSMensagem.informa("Natureza registrado com sucesso!!");
+			SSMensagem.informa("Estado registrado com sucesso!!");
 			novo();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);

@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 import com.tandera.core.dao.springjpa.MarcaRepository;
 import com.tandera.core.model.comercial.Marca;
 
-import edu.porgamdor.util.desktop.Formulario;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.SSBotao;
 import edu.porgamdor.util.desktop.ss.SSCampoTexto;
 import edu.porgamdor.util.desktop.ss.SSMensagem;
 
 @Component
-public class FrmMarca extends Formulario {
+public class FrmMarca extends FormularioCrud {
 	
 	@Autowired
 	private MarcaRepository dao;
@@ -32,8 +32,6 @@ public class FrmMarca extends Formulario {
 
 	private SSCampoTexto txtDescr = new SSCampoTexto();
 
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
 
 	public FrmMarca() {
@@ -63,25 +61,6 @@ public class FrmMarca extends Formulario {
 
 		txtDescr.setColunas(10);
 		txtDescr.setRotulo("Descrição");
-
-		cmdSair.setText("Fechar");
-		cmdSalvar.setText("Salvar");
-
-		adicionarListner();
-	}
-
-	private void adicionarListner() {
-		// Listners = Comandos = Eventos
-		cmdSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				salvar();
-			}
-		});
-		cmdSair.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sair();
-			}
-		});
 	}
 
 	// public void setEntidade(Natureza entidade) {
@@ -107,7 +86,7 @@ public class FrmMarca extends Formulario {
 		atribuir();
 	}
 
-	private void salvar() {
+	protected void salvar() {
 		try {
 			entidade.setDescr(txtDescr.getText());
 
@@ -119,7 +98,7 @@ public class FrmMarca extends Formulario {
 			// dao.gravar(operacao, entidade);
 			dao.save(entidade);
 
-			SSMensagem.informa("Natureza registrado com sucesso!!");
+			SSMensagem.informa("Marca registrado com sucesso!!");
 			novo();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);

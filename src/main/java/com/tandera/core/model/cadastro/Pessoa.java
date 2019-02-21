@@ -78,9 +78,8 @@ public class Pessoa implements Serializable {
 	@Column(name = "cep", length = 15, nullable = false)
 	private String cep;
 	
-	@NotNull
 	@Size(max = 50)
-	@Column(name = "dados_bancarios", length = 50, nullable = false)
+	@Column(name = "dados_bancarios", length = 50)
 	private String dados_bancarios;
 	
 	@NotNull

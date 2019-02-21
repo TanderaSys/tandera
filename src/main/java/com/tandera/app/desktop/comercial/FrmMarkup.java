@@ -19,14 +19,14 @@ import com.tandera.core.dao.springjpa.MarkupRepository;
 import com.tandera.core.model.comercial.Markup;
 
 import edu.porgamdor.util.desktop.Formato;
-import edu.porgamdor.util.desktop.Formulario;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.SSBotao;
 import edu.porgamdor.util.desktop.ss.SSCampoNumero;
 import edu.porgamdor.util.desktop.ss.SSCampoTexto;
 import edu.porgamdor.util.desktop.ss.SSMensagem;
 
 @Component
-public class FrmMarkup extends Formulario {
+public class FrmMarkup extends FormularioCrud {
 
 	@Autowired
 	private MarkupRepository dao;
@@ -36,8 +36,6 @@ public class FrmMarkup extends Formulario {
 	private SSCampoTexto txtSigla = new SSCampoTexto();
 	private SSCampoNumero txtValor = new SSCampoNumero();
 
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
 
 	public FrmMarkup() {
@@ -77,24 +75,6 @@ public class FrmMarkup extends Formulario {
 		txtValor.setFormato(Formato.MOEDA);
 		panelCampos.add(txtValor, gbcTxtValor);
 
-		cmdSair.setText("Fechar");
-		cmdSalvar.setText("Salvar");
-
-		adicionarListner();
-	}
-
-	private void adicionarListner() {
-		// Listners = Comandos = Eventos
-		cmdSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				salvar();
-			}
-		});
-		cmdSair.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sair();
-			}
-		});
 	}
 
 	// public void setEntidade(Natureza entidade) {
@@ -121,7 +101,7 @@ public class FrmMarkup extends Formulario {
 		atribuir();
 	}
 
-	private void salvar() {
+	protected void salvar() {
 		try {
 			entidade.setSigla(txtSigla.getText());
 			entidade.setValor(BigDecimal.valueOf(txtValor.getDouble()));
@@ -135,7 +115,7 @@ public class FrmMarkup extends Formulario {
 			// dao.gravar(operacao, entidade);
 			dao.save(entidade);
 
-			SSMensagem.informa("Natureza registrado com sucesso!!");
+			SSMensagem.informa("Markup registrado com sucesso!!");
 			novo();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);

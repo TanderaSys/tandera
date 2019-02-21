@@ -3,8 +3,6 @@ package com.tandera.app.desktop.comercial;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -16,15 +14,13 @@ import org.springframework.stereotype.Component;
 
 import com.tandera.core.dao.springjpa.CategoriaRepository;
 import com.tandera.core.model.comercial.Categoria;
-import com.tandera.core.model.comercial.Estado;
 
-import edu.porgamdor.util.desktop.Formulario;
-import edu.porgamdor.util.desktop.ss.SSBotao;
+import edu.porgamdor.util.desktop.FormularioCrud;
 import edu.porgamdor.util.desktop.ss.SSCampoTexto;
 import edu.porgamdor.util.desktop.ss.SSMensagem;
 
 @Component
-public class FrmCategoria extends Formulario {
+public class FrmCategoria extends FormularioCrud {
 	
 	@Autowired
 	private CategoriaRepository dao;
@@ -33,15 +29,13 @@ public class FrmCategoria extends Formulario {
 
 	private SSCampoTexto txtDescr = new SSCampoTexto();
 
-	private SSBotao cmdSalvar = new SSBotao();
-	private SSBotao cmdSair = new SSBotao();
 	private JCheckBox chkNovo = new JCheckBox("Novo?");
-	
+
 	public FrmCategoria() {
 		init();
 	}
 
-	private void init() {
+	protected void init() {
 		super.setTitulo("Categoria");
 		super.setDescricao("Cadastro de Categorias");
 		super.getRodape().add(chkNovo);
@@ -64,27 +58,8 @@ public class FrmCategoria extends Formulario {
 
 		txtDescr.setColunas(10);
 		txtDescr.setRotulo("Descrição");
-
-		cmdSair.setText("Fechar");
-		cmdSalvar.setText("Salvar");
-
-		adicionarListner();
 	}
-
-	private void adicionarListner() {
-		// Listners = Comandos = Eventos
-		cmdSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				salvar();
-			}
-		});
-		cmdSair.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sair();
-			}
-		});
-	}
-
+	
 	// public void setEntidade(Natureza entidade) {
 	public void setEntidade(Object entidade) {
 		this.entidade = (Categoria) entidade;
@@ -107,8 +82,9 @@ public class FrmCategoria extends Formulario {
 		entidade = new Categoria();
 		atribuir();
 	}
-
-	private void salvar() {
+    
+    @Override
+	protected void salvar() {
 		try {
 			entidade.setDescr(txtDescr.getText());
 
@@ -117,10 +93,9 @@ public class FrmCategoria extends Formulario {
 				return;
 			}
 
-			// dao.gravar(operacao, entidade);
 			dao.save(entidade);
 
-			SSMensagem.informa("Natureza registrado com sucesso!!");
+			SSMensagem.informa("Categoria registrado com sucesso!!");
 			novo();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);

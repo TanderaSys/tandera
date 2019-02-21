@@ -18,8 +18,11 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.tandera.app.desktop.cadastro.FrmPessoas;
+import com.tandera.app.desktop.orcamento.FrmCompra;
 import com.tandera.app.spring.SpringDesktopApp;
 import com.tandera.core.dao.springjpa.CategoriaRepository;
+import com.tandera.core.model.cadastro.Pessoa;
 import com.tandera.core.model.comercial.Categoria;
 
 import edu.porgamdor.util.desktop.Formulario;
@@ -194,7 +197,9 @@ public class FrmCategorias extends FormularioConsulta {
 	private void exibirCadastro(Categoria entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
 		frm.setEntidade(entidade);
-		this.exibir(frm);
+		this.dialogo(frm);
+		listar();
+			
 	}
 
 }
