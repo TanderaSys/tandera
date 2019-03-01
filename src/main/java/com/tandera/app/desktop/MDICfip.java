@@ -158,7 +158,7 @@ public class MDICfip extends MDI {
 		mnComercial.add(mnTamanho);
 		mnComercial.add(mnEstado);
 		mnComercial.add(mnMarkup);
-		mnComercial.add(mnTipo);
+		//mnComercial.add(mnTipo);
 		mnComercial.add(mnMascaraPreco);
 		mnComercial.add(mnMarca);
 		mnComercial.add(mnCategoria);
@@ -368,11 +368,11 @@ public class MDICfip extends MDI {
 		getBarraMenu().add(mnCadastros);
 		getBarraMenu().add(mnComercial);
 		getBarraMenu().add(mnOrcamento);
-		getBarraMenu().add(mnLancamentos);
-		getBarraMenu().add(mnConsultas);
-		getBarraMenu().add(mnRelatorios);
-		getBarraMenu().add(mnFerramentas);
-		getBarraMenu().add(mnAjuda);
+		//getBarraMenu().add(mnLancamentos);
+		//getBarraMenu().add(mnConsultas);
+		//getBarraMenu().add(mnRelatorios);
+		//getBarraMenu().add(mnFerramentas);
+		//getBarraMenu().add(mnAjuda);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 

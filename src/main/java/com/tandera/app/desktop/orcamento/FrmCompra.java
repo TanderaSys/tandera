@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.GroupLayout;
@@ -95,6 +96,8 @@ public class FrmCompra extends FormularioCrud {
 	@Autowired
 	private PessoaRepository pessoaRepository;
 
+	private static final BigDecimal CEM = new BigDecimal("100");
+
 	private ParamOrctoRepository paramOrctoRepository;
 	private CategoriaService categoriaService;
 	private MarcaRepository marcaRepository;
@@ -172,6 +175,10 @@ public class FrmCompra extends FormularioCrud {
 	private String acao; // NOVO | ALTERAR | EXCLUIR | CONSULTAR
 	private final SSBotao btnPessoas = new SSBotao();
 
+	public void setAcao(String acao) {
+		this.acao = acao;
+	}
+
 	@Autowired
 	public FrmCompra(CategoriaService categoriaService, TamanhoRepository tamanhoRepository,
 			MarcaRepository marcaRepository, EstadoRepository estadoRepository,
@@ -216,8 +223,8 @@ public class FrmCompra extends FormularioCrud {
 		super.getRodape().add(cmdReprovado);
 		super.getRodape().add(cmdEstorno);
 		super.getRodape().add(chkNovo);
-		super.getRodape().add(cmdSalvar);
-		super.getRodape().add(cmdSair);
+		// super.getRodape().add(cmdSalvar);
+		// super.getRodape().add(cmdSair);
 
 		adicionarListner();
 		configurarCamposCompra();
@@ -254,9 +261,9 @@ public class FrmCompra extends FormularioCrud {
 		txtCodigo.setRotulo("Código");
 
 		txtData.setBounds(120, 5, 127, 50);
-		panelCampos.add(txtData);
 		txtData.setColunas(10);
 		txtData.setRotulo("Data");
+		panelCampos.add(txtData);
 
 		cboConsignado.setBounds(380, 5, 94, 50);
 		cboConsignado.setRotulo("Consignado");
@@ -385,6 +392,7 @@ public class FrmCompra extends FormularioCrud {
 		txtTotalOrcto.setRotuloPosicao(PosicaoRotulo.TOPO);
 		txtTotalOrcto.setColunas(10);
 		panelTotal.add(txtTotalOrcto);
+		// habilitaCabecalho(false);
 
 	}
 
@@ -550,7 +558,7 @@ public class FrmCompra extends FormularioCrud {
 		txtDeposito.addValidacaoListener(new ValidacaoListener() {
 			@Override
 			public void validacaoListener(ValidacaoEvento arg0) {
-				calculaValorTotalOrcto();
+				calculaFatorTroca();
 				calculaQuantidadeItens();
 				calculaTotalItens();
 				// calculaValorTotalDesconto();
@@ -560,7 +568,7 @@ public class FrmCompra extends FormularioCrud {
 		txtDoacao.addValidacaoListener(new ValidacaoListener() {
 			@Override
 			public void validacaoListener(ValidacaoEvento arg0) {
-				calculaValorTotalOrcto();
+				calculaFatorDoacao();
 				calculaQuantidadeItens();
 				calculaTotalItens();
 				// calculaValorTotalDesconto();
@@ -570,7 +578,7 @@ public class FrmCompra extends FormularioCrud {
 		txtTroca.addValidacaoListener(new ValidacaoListener() {
 			@Override
 			public void validacaoListener(ValidacaoEvento arg0) {
-				calculaValorTotalOrcto();
+				calculaFatorTroca();
 				calculaQuantidadeItens();
 				calculaTotalItens();
 				// calculaValorTotalDesconto();
@@ -731,6 +739,7 @@ public class FrmCompra extends FormularioCrud {
 			txtNome.setValue(compra.getNome());
 			txtTelefone.setValue(compra.getTelefone());
 			txtObs.setValue(compra.getObs());
+			txtTotalOrcto.setValue(compra.getVlOrcamento());
 			txtDeposito.setValue(compra.getVlDeposito());
 			txtTroca.setValue(compra.getVlTroca());
 			txtDoacao.setValue(compra.getVlDoacao());
@@ -752,8 +761,10 @@ public class FrmCompra extends FormularioCrud {
 	protected void salvar() {
 		try {
 			if (this.acao.equals(Constantes.ACAO_EXCLUSAO)) {
+				calculaValorTotalOrcto();
 				compraRepository.saveAndFlush(compra);
 				SSMensagem.informa("Item Excluido com sucesso!!");
+				this.acao = Constantes.ACAO_CONSULTAR;
 			} else {
 				compra.setData(txtData.getDataHora());
 
@@ -781,8 +792,9 @@ public class FrmCompra extends FormularioCrud {
 				compra.setTelefone(txtTelefone.getText());
 				compra.setObs(txtObs.getText());
 				compra.setVlDeposito(Biblioteca.formataBigDecimal(txtDeposito.getText(), 2));
-				compra.setVlTroca(new BigDecimal(txtTroca.getText()).setScale(2, BigDecimal.ROUND_HALF_UP));
-				compra.setVlDoacao(new BigDecimal(txtDoacao.getText()).setScale(2, BigDecimal.ROUND_HALF_UP));
+				compra.setVlTroca(Biblioteca.formataBigDecimal(txtTroca.getText(), 2));
+				compra.setVlDoacao(Biblioteca.formataBigDecimal(txtDoacao.getText(), 2));
+				compra.setVlOrcamento(Biblioteca.formataBigDecimal(txtTotalOrcto.getText(), 2));
 				compra.setReprovado(txtTotalReprovados.getInteger());
 
 				if (compra.getData() == null || compra.getStatus() == null || compra.getNome() == null
@@ -791,8 +803,13 @@ public class FrmCompra extends FormularioCrud {
 					SSMensagem.avisa("Dados incompletos");
 					return;
 				}
-
+				System.out.println("salvando");
+				compra.getItemCompra().forEach((item)->{
+					System.out.println(item);
+				});
+				System.out.println("/////");
 				compraRepository.save(compra);
+				limparPainelInclusao();
 				this.acao = Constantes.ACAO_CONSULTAR;
 				SSMensagem.informa("Orçamento de Compra registrado com sucesso!!");
 				novo();
@@ -876,6 +893,7 @@ public class FrmCompra extends FormularioCrud {
 			compra.getItemCompra().remove(itemCompra);
 			compra.setItemCompra(numeraItens(compra.getItemCompra()));
 			salvar();
+			cmdSalvar.setEnabled(false);
 			tabela.setValue(compra.getItemCompra());
 		}
 
@@ -896,6 +914,11 @@ public class FrmCompra extends FormularioCrud {
 		if (validaItens()) {
 			this.mascaraPreco = ((MascaraPreco) cboMascara.getValue());
 			itemCompra.setCategoria((Categoria) cboCategoria.getValue());
+
+			itemCompra.setFatorDeposito(((Categoria) cboCategoria.getValue()).getFatorDeposito());
+			itemCompra.setFatorTroca(((Categoria) cboCategoria.getValue()).getFatorTroca());
+			itemCompra.setFatorDoacao(((Categoria) cboCategoria.getValue()).getFatorDoacao());
+
 			itemCompra.setMarca((Marca) cboMarca.getValue());
 			itemCompra.setTamanho((Tamanho) cboTamanho.getValue());
 			itemCompra.setEstado((Estado) cboQualidade.getValue());
@@ -920,17 +943,17 @@ public class FrmCompra extends FormularioCrud {
 				listaDeItens.remove(this.itemCompraSelecionado);
 				listaDeItens.add(itemCompra);
 			}
-			//this.compra.setItemCompra(listaDeItens);
-			//tabela.setValue(listaDeItens);
+			// this.compra.setItemCompra(listaDeItens);
+			// tabela.setValue(listaDeItens);
 		}
 		// limpar campos de adicao/alteração de itens
 		this.compra.setItemCompra(listaDeItens);
 		listaDeItens = ordenaItens(listaDeItens);
 		tabela.setValue(listaDeItens);
-		
+
 		limparPainelInclusao();
 		calculaValorTotalOrcto();
-		//loadItens();
+		// loadItens();
 
 		if (!chkNovoItem.isSelected()) {
 			panel_inclusao.setVisible(false);
@@ -948,21 +971,18 @@ public class FrmCompra extends FormularioCrud {
 		});
 		return listaRetorno;
 	}
-    
-	private List<ItemCompra> ordenaItens(List<ItemCompra> lista){
+
+	private List<ItemCompra> ordenaItens(List<ItemCompra> lista) {
 		if (this.acao.equals(Constantes.ACAO_NOVO)) {
-		    lista.sort(Comparator.comparingInt(ItemCompra::getItem).reversed());
-		}
-		else {
+			lista.sort(Comparator.comparingInt(ItemCompra::getItem).reversed());
+		} else {
 			lista.sort(Comparator.comparingInt(ItemCompra::getItem));
 		}
-		
-		
+
 		return lista;
 	}
-	
-	
-	private  void limparPainelInclusao() {
+
+	private void limparPainelInclusao() {
 		cboCategoria.setValue(null);
 		cboMascara.setValue(null);
 		cboMarca.setValue(null);
@@ -993,11 +1013,29 @@ public class FrmCompra extends FormularioCrud {
 		txtTotalProdutos.setText(null);
 	}
 
+	public void habilitaCabecalho(boolean editavel) {
+		txtIdPessoa.setEditavel(editavel);
+		txtObs.setEditavel(editavel);
+		txtCodigo.setEditavel(editavel);
+		txtData.setEditavel(editavel);
+		txtDeposito.setEditavel(editavel);
+		txtDoacao.setEditavel(editavel);
+		txtTroca.setEditavel(editavel);
+		txtNome.setEditavel(editavel);
+		txtTelefone.setEditavel(editavel);
+		txtTotalOrcto.setEditavel(editavel);
+		cboConsignado.setEditavel(editavel);
+		cboStatus.setEditavel(editavel);
+		txtTotalReprovados.setEditavel(editavel);
+		txtTotalItensOrcam.setEditavel(editavel);
+		txtTotalProdutos.setEditavel(editavel);
+	}
+
 	private void calculaValorTotalInclusao() {
 		if (Biblioteca.temValorValido(txtQtde, "I") && Biblioteca.temValorValido(txtValor, "N")) {
 			int qtd = Integer.parseInt(txtQtde.getText());
-			BigDecimal valorUnitario = txtValor.getBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP);
-			BigDecimal resultado = valorUnitario.multiply(new BigDecimal(qtd)).setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal valorUnitario = txtValor.getBigDecimal().setScale(2, RoundingMode.HALF_UP);
+			BigDecimal resultado = valorUnitario.multiply(new BigDecimal(qtd)).setScale(2, RoundingMode.HALF_UP);
 			txtValorTotalItem.setNumero(resultado);
 		}
 	}
@@ -1008,29 +1046,60 @@ public class FrmCompra extends FormularioCrud {
 	}
 
 	private void carregaValorTotalOrcto() {
-		txtTotalOrcto.setText(compra.getVlDeposito().toString());
+		txtTotalOrcto.setText(compra.getVlOrcamento().toString());
 		txtDeposito.setText(compra.getVlDeposito().toString());
 		txtTroca.setText(compra.getVlTroca().toString());
 		txtDoacao.setText(compra.getVlDoacao().toString());
 	}
 
-	private void calculaValorTotalOrcto() {
-		BigDecimal valorOrcto = compra.getItemCompra()
-				                      .stream()
-				                      .map(item -> item.getValorTotal())
-				                      .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-	//	txtTotalOrcto.setText(valorOrcto.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-		compra.setVlDeposito(valorOrcto.setScale(2, BigDecimal.ROUND_HALF_UP));
-	// txtDeposito.setText(new BigDecimal(txtTotalOrcto.getText()).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-		BigDecimal fatorTroca = paramOrcto.getTroca().divide(new BigDecimal("100")).add(new BigDecimal("1")).setScale(2,
-				BigDecimal.ROUND_HALF_UP);
-		//txtTroca.setText(valorOrcto.multiply(fatorTroca).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-		compra.setVlTroca(valorOrcto.multiply(fatorTroca).setScale(2, BigDecimal.ROUND_HALF_UP));
-		BigDecimal fatorDoacao = paramOrcto.getDoacao().divide(new BigDecimal("100")).add(new BigDecimal("1"))
-				.setScale(2, BigDecimal.ROUND_HALF_UP);
+	private void calculaFatorDeposito() {
+		BigDecimal valorFatorDeposito = compra.getItemCompra().stream().map((item) -> {
+			BigDecimal result = item.getValorTotal().multiply(item.getFatorDeposito().divide(CEM));
+			System.out.println(result + " Fator: " + item.getFatorDeposito() + " " +  item.getValorTotal());
+			result = result.add(item.getValorTotal());
+			System.out.println(result + " Fator: " + item.getFatorDeposito() + " " +  item.getValorTotal());
+			return result;
+		}).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
 
-		//		txtDoacao.setText(valorOrcto.multiply(fatorDoacao).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-		compra.setVlDoacao(valorOrcto.multiply(fatorDoacao).setScale(2, BigDecimal.ROUND_HALF_UP));
+		compra.setVlDeposito(valorFatorDeposito);
+
+	}
+
+	private void calculaFatorTroca() {
+		BigDecimal valorFatorTroca = compra.getItemCompra().stream().map(
+				(item) -> (item.getValorTotal().multiply(item.getFatorTroca().divide(CEM)).add(item.getValorTotal())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+
+		compra.setVlTroca(valorFatorTroca);
+
+	}
+
+	private void calculaFatorDoacao() {
+		BigDecimal valorFatorDoacao = compra.getItemCompra().stream().map(
+				(item) -> item.getValorTotal().multiply(item.getFatorDoacao().divide(CEM).add(item.getValorTotal())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+
+		compra.setVlDoacao(valorFatorDoacao);
+
+	}
+
+	private void calculaValorTotalOrcto() {
+		BigDecimal valorOrcto = compra.getItemCompra().stream().map(
+				(item) -> item.getValorTotal())
+				.reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+
+		compra.setVlOrcamento(valorOrcto);
+		// txtTotalOrcto.setText(valorOrcto.setScale(2,
+		// BigDecimal.ROUND_HALF_UP).toString());
+		calculaFatorDeposito();
+		// txtDeposito.setText(new BigDecimal(txtTotalOrcto.getText()).setScale(2,
+		// BigDecimal.ROUND_HALF_UP).toString());
+		calculaFatorTroca();
+		// txtTroca.setText(valorOrcto.multiply(fatorTroca).setScale(2,
+		// BigDecimal.ROUND_HALF_UP).toString());
+		calculaFatorDoacao();
+		// txtDoacao.setText(valorOrcto.multiply(fatorDoacao).setScale(2,
+		// BigDecimal.ROUND_HALF_UP).toString());
 		carregaValorTotalOrcto();
 
 	}
@@ -1077,7 +1146,7 @@ public class FrmCompra extends FormularioCrud {
 				vcContadorDeItens = lista.size();
 				tabela.setValue(lista);
 			}
-			//calculaValorTotalOrcto();
+			// calculaValorTotalOrcto();
 			carregaValorTotalOrcto();
 			calculaQuantidadeItens();
 			calculaTotalItens();
@@ -1130,7 +1199,7 @@ public class FrmCompra extends FormularioCrud {
 		if (SSMensagem.confirma("Confirma Aprovação de Doação do Orçamento?")) {
 			if (validaAprovacao()) {
 				String historico = "Aprovação: (Status: " + StatusOrcamento.AD.toString() + " - Valor Aprovado: "
-						+  String.format("%12.2f",compra.getVlAprovado()) + ")";
+						+ String.format("%12.2f", compra.getVlAprovado()) + ")";
 				LiberacaoUsuario liberacaoUsuario = autorizacao(historico);
 
 				if (liberacaoUsuario != null) {
@@ -1152,7 +1221,7 @@ public class FrmCompra extends FormularioCrud {
 		if (SSMensagem.confirma("Confirma Aprovação de Troca do Orçamento?")) {
 			if (validaAprovacao()) {
 				String historico = "Aprovação: (Status: " + StatusOrcamento.AT.toString() + " - Valor Aprovado: "
-						+  String.format("%12.2f",compra.getVlAprovado()) + ")";
+						+ String.format("%12.2f", compra.getVlAprovado()) + ")";
 				LiberacaoUsuario liberacaoUsuario = autorizacao(historico);
 
 				if (liberacaoUsuario != null) {
@@ -1185,7 +1254,7 @@ public class FrmCompra extends FormularioCrud {
 		if (SSMensagem.confirma("Confirma Reprovação do Orçamento?")) {
 
 			String historico = "Reprovação: (Status: " + compra.getStatus().toString() + " - Valor Aprovado: "
-					+  String.format("%12.2f",compra.getVlAprovado()) + ")";
+					+ String.format("%12.2f", compra.getVlAprovado()) + ")";
 
 			LiberacaoUsuario liberacaoUsuario = autorizacao(historico);
 
@@ -1203,10 +1272,8 @@ public class FrmCompra extends FormularioCrud {
 
 	private void estornarOrcto() {
 		if (SSMensagem.confirma("Confirma Estorno do Orçamento?")) {
-			String historico = "Estorno: (Status: " + 
-		                       compra.getStatus().toString() + 
-		                       "Valor Aprovado: " + 
-		                       String.format("%12.2f", compra.getVlAprovado()) + ")";
+			String historico = "Estorno: (Status: " + compra.getStatus().toString() + "Valor Aprovado: "
+					+ String.format("%12.2f", compra.getVlAprovado()) + ")";
 			LiberacaoUsuario liberacaoUsuario = autorizacao(historico);
 			if (liberacaoUsuario != null) {
 				cboStatus.setValue(StatusOrcamento.N);

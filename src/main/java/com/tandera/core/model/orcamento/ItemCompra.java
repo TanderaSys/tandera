@@ -79,6 +79,15 @@ public class ItemCompra implements Serializable  {
 	@Column(name = "valor", nullable = false)
 	private BigDecimal valor = BigDecimal.ZERO;
 	
+	@Column(name = "fatorTroca", nullable = false)
+	private BigDecimal fatorTroca;
+	
+	@Column(name = "fatorDoacao", nullable = false)
+	private BigDecimal fatorDoacao;
+
+	@Column(name = "fatorDeposito", nullable = false)
+	private BigDecimal fatorDeposito;
+	
 	@ManyToOne
 	@JoinColumn(name="compra_id",foreignKey = @ForeignKey(name="fk07_itemCompra"))
 	private Compra compra;
@@ -91,102 +100,166 @@ public class ItemCompra implements Serializable  {
 		return getValor().multiply(BigDecimal.valueOf(getQtde()));
 	}
 
+
 	public Integer getId() {
 		return id;
 	}
+
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
+
 	public Integer getItem() {
 		return item;
 	}
-	
+
+
 	public void setItem(Integer item) {
 		this.item = item;
 	}
-	
+
+
 	public Categoria getCategoria() {
 		return categoria;
 	}
+
 
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
 
+
 	public Marca getMarca() {
 		return marca;
 	}
+
 
 	public void setMarca(Marca marca) {
 		this.marca = marca;
 	}
 
+
 	public Tamanho getTamanho() {
 		return tamanho;
 	}
+
 
 	public void setTamanho(Tamanho tamanho) {
 		this.tamanho = tamanho;
 	}
 
+
 	public Estado getEstado() {
 		return estado;
 	}
+
 
 	public void setEstado(Estado estado) {
 		this.estado = estado;
 	}
 
-	public Markup getMarkup() {
-		return markup;
-	}
-
-	public void setMarkup(Markup markup) {
-		this.markup = markup;
-	}
-
-	public Integer getQtde() {
-		return qtde;
-	}
-
-	public void setQtde(Integer qtde) {
-		this.qtde = qtde;
-	}
-
-	public BigDecimal getValor() {
-		return valor;
-	}
-
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
-	}
-
-	public Compra getCompra() {
-		return compra;
-	}
-
-	public void setCompra(Compra compra) {
-		this.compra = compra;
-	}
-	
-	public void setVlMascara(BigDecimal vlMascara) {
-		this.vlMascara = vlMascara;
-	}
-	
-	public BigDecimal getVlMascara() {
-		return vlMascara;
-	}
-	
 
 	public MascaraPreco getMascaraPreco() {
 		return mascaraPreco;
 	}
 
+
 	public void setMascaraPreco(MascaraPreco mascaraPreco) {
 		this.mascaraPreco = mascaraPreco;
 	}
+
+
+	public BigDecimal getVlMascara() {
+		return vlMascara;
+	}
+
+
+	public void setVlMascara(BigDecimal vlMascara) {
+		this.vlMascara = vlMascara;
+	}
+
+
+	public Markup getMarkup() {
+		return markup;
+	}
+
+
+	public void setMarkup(Markup markup) {
+		this.markup = markup;
+	}
+
+
+	public Integer getQtde() {
+		return qtde;
+	}
+
+
+	public void setQtde(Integer qtde) {
+		this.qtde = qtde;
+	}
+
+
+	public BigDecimal getValor() {
+		return valor;
+	}
+
+
+	public void setValor(BigDecimal valor) {
+		this.valor = valor;
+	}
+
+
+	public BigDecimal getFatorTroca() {
+		return fatorTroca;
+	}
+
+
+	public void setFatorTroca(BigDecimal fatorTroca) {
+		this.fatorTroca = fatorTroca;
+	}
+
+
+	public BigDecimal getFatorDoacao() {
+		return fatorDoacao;
+	}
+
+
+	public void setFatorDoacao(BigDecimal fatorDoacao) {
+		this.fatorDoacao = fatorDoacao;
+	}
+
+
+	public BigDecimal getFatorDeposito() {
+		return fatorDeposito;
+	}
+
+
+	public void setFatorDeposito(BigDecimal fatorDeposito) {
+		this.fatorDeposito = fatorDeposito;
+	}
+
+
+	public Compra getCompra() {
+		return compra;
+	}
+
+
+	public void setCompra(Compra compra) {
+		this.compra = compra;
+	}
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -195,6 +268,7 @@ public class ItemCompra implements Serializable  {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -213,12 +287,15 @@ public class ItemCompra implements Serializable  {
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "ItemCompra [id=" + id + ", categoria=" + categoria + ", marca=" + marca + ", tamanho=" + tamanho
-				+ ", estado=" + estado + ", mascara=" + mascaraPreco + ", vlMascara=" + vlMascara + ", markup=" + markup
-				+ ", qtde=" + qtde + ", valor=" + valor + ", compra=" + compra + "]";
+		return "ItemCompra [id=" + id + ", item=" + item + ", categoria=" + categoria + ", marca=" + marca
+				+ ", tamanho=" + tamanho + ", estado=" + estado + ", mascaraPreco=" + mascaraPreco + ", vlMascara="
+				+ vlMascara + ", markup=" + markup + ", qtde=" + qtde + ", valor=" + valor + ", fatorTroca="
+				+ fatorTroca + ", fatorDoacao=" + fatorDoacao + ", fatorDeposito=" + fatorDeposito + ", compra="
+				+ compra + ", valorTotal=" + valorTotal + "]";
 	}
 
-
+	
 }

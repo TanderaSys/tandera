@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -84,6 +85,10 @@ public class Compra implements Serializable {
 	private BigDecimal vlDoacao = BigDecimal.ZERO;
 	
 	@NotNull
+	@Column(name = "vl_orcamento", nullable = false)
+	private BigDecimal vlOrcamento = BigDecimal.ZERO;
+	
+	@NotNull
 	@Column(name = "reprovado", nullable = false, columnDefinition = "integer default 0")
 	private Integer reprovado;
 	
@@ -96,8 +101,6 @@ public class Compra implements Serializable {
 	@NotNull
 	@Column(name = "vl_aprovado")
 	private BigDecimal vlAprovado = BigDecimal.ZERO;
-	
-	
 
 	public Integer getId() {
 		return id;
@@ -179,20 +182,12 @@ public class Compra implements Serializable {
 		this.vlDoacao = vlDoacao;
 	}
 
-	public List<ItemCompra> getItemCompra() {
-		return itemCompra;
+	public BigDecimal getVlOrcamento() {
+		return vlOrcamento;
 	}
 
-	public void setItemCompra(List<ItemCompra> itemCompra) {
-		this.itemCompra = itemCompra;
-	}
-	
-	public SimNao getConsignado() {
-		return consignado;
-	}
-
-	public void setConsignado(SimNao consignado) {
-		this.consignado = consignado;
+	public void setVlOrcamento(BigDecimal vlOrcamento) {
+		this.vlOrcamento = vlOrcamento;
 	}
 
 	public Integer getReprovado() {
@@ -202,13 +197,33 @@ public class Compra implements Serializable {
 	public void setReprovado(Integer reprovado) {
 		this.reprovado = reprovado;
 	}
-	
+
+	public List<ItemCompra> getItemCompra() {
+		return itemCompra;
+	}
+
+	public void setItemCompra(List<ItemCompra> itemCompra) {
+		this.itemCompra = itemCompra;
+	}
+
+	public SimNao getConsignado() {
+		return consignado;
+	}
+
+	public void setConsignado(SimNao consignado) {
+		this.consignado = consignado;
+	}
+
 	public BigDecimal getVlAprovado() {
 		return vlAprovado;
 	}
-	
+
 	public void setVlAprovado(BigDecimal vlAprovado) {
 		this.vlAprovado = vlAprovado;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	@Override
@@ -240,10 +255,8 @@ public class Compra implements Serializable {
 	public String toString() {
 		return "Compra [id=" + id + ", data=" + data + ", status=" + status + ", pessoa=" + pessoa + ", nome=" + nome
 				+ ", telefone=" + telefone + ", obs=" + obs + ", vlDeposito=" + vlDeposito + ", vlTroca=" + vlTroca
-				+ ", vlDoacao=" + vlDoacao + ", reprovado=" + reprovado + ", itemCompra=" + itemCompra + ", consignado="
-				+ consignado + ", vlAprovado=" + vlAprovado + "]";
+				+ ", vlDoacao=" + vlDoacao + ", vlOrcamento=" + vlOrcamento + ", reprovado=" + reprovado
+				+ ", itemCompra=" + itemCompra + ", consignado=" + consignado + ", vlAprovado=" + vlAprovado + "]";
 	}
-
-	
 
 }

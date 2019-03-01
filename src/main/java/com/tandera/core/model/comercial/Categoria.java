@@ -1,6 +1,7 @@
 package com.tandera.core.model.comercial;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,20 @@ public class Categoria implements Serializable {
 	@Column(name = "descr", length = 50, nullable = false)
 	private String descr;
 	
+	@NotNull
+	@Column(name = "fatorTroca", nullable = false)
+	private BigDecimal fatorTroca;
+	
+	@NotNull
+	@Column(name = "fatorDoacao", nullable = false)
+	private BigDecimal fatorDoacao;
+
+	@NotNull
+	@Column(name = "fatorDeposito", nullable = false)
+	private BigDecimal fatorDeposito;
+	
 	@OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
-	private List<ItemCompra>itemCompra = new ArrayList<ItemCompra>(); 
+	private List<ItemCompra>itemCompra = new ArrayList<ItemCompra>();
 
 	public Integer getId() {
 		return id;
@@ -55,6 +68,42 @@ public class Categoria implements Serializable {
 
 	public void setDescr(String descr) {
 		this.descr = descr;
+	}
+
+	public BigDecimal getFatorTroca() {
+		return fatorTroca;
+	}
+
+	public void setFatorTroca(BigDecimal fatorTroca) {
+		this.fatorTroca = fatorTroca;
+	}
+
+	public BigDecimal getFatorDoacao() {
+		return fatorDoacao;
+	}
+
+	public void setFatorDoacao(BigDecimal fatorDoacao) {
+		this.fatorDoacao = fatorDoacao;
+	}
+
+	public BigDecimal getFatorDeposito() {
+		return fatorDeposito;
+	}
+
+	public void setFatorDeposito(BigDecimal fatorDeposito) {
+		this.fatorDeposito = fatorDeposito;
+	}
+
+	public List<ItemCompra> getItemCompra() {
+		return itemCompra;
+	}
+
+	public void setItemCompra(List<ItemCompra> itemCompra) {
+		this.itemCompra = itemCompra;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	@Override
@@ -84,7 +133,10 @@ public class Categoria implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Categoria [id=" + id + ", descr=" + descr + "]";
-	}
+		return "Categoria [id=" + id + ", descr=" + descr + ", fatorTroca=" + fatorTroca + ", fatorDoacao="
+				+ fatorDoacao + ", fatorDeposito=" + fatorDeposito + ", itemCompra=" + itemCompra + "]";
+	} 
+
+	
 
 }

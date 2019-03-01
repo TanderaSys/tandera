@@ -55,7 +55,7 @@ public class FrmPessoas extends FormularioConsulta {
 	private SSBotao cmdSelecionar = new SSBotao();
 	private SSBotao cmdIncluir = new SSBotao();
 	private SSBotao cmdAlterar = new SSBotao();
-	private SSBotao cmdFechar = new SSBotao();
+	//private SSBotao cmdFechar = new SSBotao();
 	
 	
 	public FrmPessoas() {
@@ -97,7 +97,7 @@ public class FrmPessoas extends FormularioConsulta {
 		tabela.getModeloTabela().addColumn("CPF");
 
 		tabela.getModeloColuna().getColumn(0).setPreferredWidth(30);
-		tabela.getModeloColuna().getColumn(1).setPreferredWidth(250);
+		tabela.getModeloColuna().getColumn(1).setPreferredWidth(280);
 		tabela.getModeloColuna().getColumn(2).setPreferredWidth(120);
 
 		tabela.getModeloColuna().setCampo(0, "id");
@@ -174,7 +174,8 @@ public class FrmPessoas extends FormularioConsulta {
 		return filtro;
 	}
 
-	private void sair() {
+	@Override
+	protected void sair() {
 		super.fechar();
 	}
 
@@ -202,7 +203,8 @@ public class FrmPessoas extends FormularioConsulta {
 		exibirCadastro(null);
 	}
 
-	private void alterar() {
+	@Override
+	protected void alterar() {
 		Pessoa entidade = (Pessoa) tabela.getLinhaSelecionada();
 		if (entidade == null) {
 			SSMensagem.avisa("Selecione um item da lista");

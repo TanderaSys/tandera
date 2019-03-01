@@ -126,7 +126,7 @@ public class FrmPessoa extends FormularioCrud {
 		txtTelefone.setBounds(320, 255, 240, 50);
 		txtTelefone.setRotulo("Telefone");
 		txtTelefone.setColunas(10);
-		setarMascaraTelefone();
+		//setarMascaraTelefone();
 		txtTelefone.setFormatarAoAplicar(true);
 		txtTelefone.isValidarAoSair();
 		panelCampos.add(txtTelefone);
@@ -140,7 +140,7 @@ public class FrmPessoa extends FormularioCrud {
 		txtCliente.setBounds(188, 312, 87, 23);
 		panelCampos.add(txtCliente);
 		
-		txtTelefone.addValidacaoListener(new ValidacaoListener() {
+		/*txtTelefone.addValidacaoListener(new ValidacaoListener() {
 			
 			@Override
 			public void validacaoListener(ValidacaoEvento evento) {
@@ -153,6 +153,7 @@ public class FrmPessoa extends FormularioCrud {
 			}
 	
 		});
+		*/
 
 	}
 
@@ -191,22 +192,17 @@ public class FrmPessoa extends FormularioCrud {
 		}
 	}
 	
+	/*
 	private void setarMascaraTelefone() {
 		try {
 			 txtTelefone.setMascara("(##) #####-#### ");
-			 if (txtTelefone.getText().length() == 10){ //telefone comum
-		           //faça a sua máscara (35) 3821 2345
-		           txtTelefone.setMascara("(##)####-#### ");
-			 } else if (txtTelefone.getText().length() == 11){
-		           //faça a sua máscara (35) 93821 2345
-		    	   txtTelefone.setMascara("(##) #####-#### ");
-		       }
 	         
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
 	
 	private static String formatarString(String texto, String mascara) throws ParseException {
         MaskFormatter mf = new MaskFormatter(mascara);
@@ -222,10 +218,10 @@ public class FrmPessoa extends FormularioCrud {
 		// faça a sua máscara (35) 3821 2345
 		System.out.println("tamanaho da mascara: " + txtTelefone.getText().length());
 		try {
-			if (txtTelefone.getText().length() == 14) { // telefone comum
+			if (txtTelefone.getText().length() == 15) { // telefone comum
 				
 				txtTelefone.setMascara("(##) ####-####");
-			} else if (txtTelefone.getText().length() == 15) {
+			} else if (txtTelefone.getText().length() == 16) {
 				// faça a sua máscara (35) 93821 2345
 				txtTelefone.setMascara("(##) #####-####");
 			}
@@ -237,9 +233,10 @@ public class FrmPessoa extends FormularioCrud {
 		}
 
     } 
+    */
 
 	private void criar() {
-		setarMascaraTelefone();
+		//setarMascaraTelefone();
 		entidade = new Pessoa();
 		atribuir();
 	}

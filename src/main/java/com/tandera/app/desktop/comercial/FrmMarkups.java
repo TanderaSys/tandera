@@ -20,7 +20,9 @@ import org.springframework.stereotype.Component;
 
 import com.tandera.app.spring.SpringDesktopApp;
 import com.tandera.core.dao.springjpa.MarkupRepository;
+import com.tandera.core.model.comercial.Categoria;
 import com.tandera.core.model.comercial.Markup;
+import com.tandera.core.util.Constantes;
 
 import edu.porgamdor.util.desktop.Formulario;
 import edu.porgamdor.util.desktop.FormularioConsulta;
@@ -49,7 +51,13 @@ public class FrmMarkups extends FormularioConsulta {
 
 	private SSBotao cmdIncluir = new SSBotao();
 	private SSBotao cmdAlterar = new SSBotao();
-	private SSBotao cmdFechar = new SSBotao();
+	private final SSBotao cmdExcluir = new SSBotao();
+
+	private String acao; // NOVO | ALTERAR | EXCLUIR | CONSULTAR
+
+	public void setAcao(String acao) {
+		this.acao = acao;
+	}
 
 	public FrmMarkups() {
 		// JA PODERIA VIR DE FormularioConsulta
@@ -74,6 +82,7 @@ public class FrmMarkups extends FormularioConsulta {
 		cmdIncluir.setText("Incluir");
 		cmdIncluir.setIcone("novo");
 		cmdAlterar.setText("Alterar");
+		cmdExcluir.setText("Excluir");
 		cmdFechar.setText("Fechar");
 		txtFiltro.setColunas(30);
 	}
@@ -86,7 +95,7 @@ public class FrmMarkups extends FormularioConsulta {
 		tabela.getModeloTabela().addColumn("Valor");
 
 		tabela.getModeloColuna().getColumn(0).setPreferredWidth(30);
-		tabela.getModeloColuna().getColumn(1).setPreferredWidth(250);
+		tabela.getModeloColuna().getColumn(1).setPreferredWidth(280);
 		tabela.getModeloColuna().getColumn(2).setPreferredWidth(70);
 
 		tabela.getModeloColuna().setCampo(0, "id");
@@ -126,6 +135,7 @@ public class FrmMarkups extends FormularioConsulta {
 
 		getRodape().add(cmdIncluir);
 		getRodape().add(cmdAlterar);
+		getRodape().add(cmdExcluir);
 		getRodape().add(cmdFechar);
 	}
 
@@ -151,13 +161,20 @@ public class FrmMarkups extends FormularioConsulta {
 				alterar();
 			}
 		});
+		cmdExcluir.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				excluirItem();
+			}
+		});
 	}
 
 	public JPanel getFiltro() {
 		return filtro;
 	}
 
-	private void sair() {
+	@Override
+	protected void sair() {
 		super.fechar();
 	}
 
@@ -185,13 +202,31 @@ public class FrmMarkups extends FormularioConsulta {
 		exibirCadastro(null);
 	}
 
-	private void alterar() {
+	@Override
+	protected void alterar() {
 		Markup entidade = (Markup) tabela.getLinhaSelecionada();
 		if (entidade == null) {
 			SSMensagem.avisa("Selecione um item da lista");
 			return;
 		}
 		exibirCadastro(entidade);
+	}
+	
+	private void excluirItem() {
+		Markup markup = (Markup) tabela.getLinhaSelecionada();
+		if (markup == null) {
+			SSMensagem.avisa("Selecione um item da lista");
+			return;
+		}
+
+		if (SSMensagem.confirma("Confirma exclusão do Registro (" + markup.getId() + "-"
+				+ markup.getSigla() + ")?")) {
+			this.acao = Constantes.ACAO_EXCLUSAO;
+			dao.deleteItemCategoria(markup.getId());
+			SSMensagem.informa("Item Excluido com sucesso!!");
+			listar();
+		}
+
 	}
 
 	private void exibirCadastro(Markup entidade) {

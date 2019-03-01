@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.tandera.app.spring.SpringDesktopApp;
 import com.tandera.core.dao.springjpa.CompraRepository;
 import com.tandera.core.model.orcamento.Compra;
+import com.tandera.core.util.Constantes;
 
 import edu.porgamdor.util.desktop.Formulario;
 import edu.porgamdor.util.desktop.FormularioConsulta;
@@ -31,12 +32,12 @@ import edu.porgamdor.util.desktop.ss.SSMensagem;
 import edu.porgamdor.util.desktop.ss.util.Validacao;
 
 @Component
-@Scope (value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FrmCompras extends FormularioConsulta {
-	
+
 	@Autowired
 	CompraRepository dao;
-	
+
 	Class formInclusao = FrmCompra.class;
 
 	// JA PODERIA VIR DE FormularioConsulta
@@ -49,7 +50,7 @@ public class FrmCompras extends FormularioConsulta {
 
 	private SSBotao cmdIncluir = new SSBotao();
 	private SSBotao cmdAlterar = new SSBotao();
-	private SSBotao cmdFechar = new SSBotao();
+	//private SSBotao cmdFechar = new SSBotao();
 
 	public FrmCompras() {
 		// JA PODERIA VIR DE FormularioConsulta
@@ -160,7 +161,8 @@ public class FrmCompras extends FormularioConsulta {
 		return filtro;
 	}
 
-	private void sair() {
+	@Override
+	protected void sair() {
 		super.fechar();
 	}
 
@@ -172,7 +174,7 @@ public class FrmCompras extends FormularioConsulta {
 				lista = dao.findAll();
 
 			} else {
-				//lista = dao.findByCompraContainingIgnoreCase(compra);
+				// lista = dao.findByCompraContainingIgnoreCase(compra);
 			}
 			if (lista.size() == 0)
 				SSMensagem.avisa("Nenhum dado encontrado");
@@ -188,7 +190,8 @@ public class FrmCompras extends FormularioConsulta {
 		exibirCadastro(null);
 	}
 
-	private void alterar() {
+	@Override
+	protected void alterar() {
 		Compra entidade = (Compra) tabela.getLinhaSelecionada();
 		if (entidade == null) {
 			SSMensagem.avisa("Selecione um item da lista");
@@ -199,13 +202,13 @@ public class FrmCompras extends FormularioConsulta {
 
 	private void exibirCadastro(Compra entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
-		((FrmCompra)frm).limparCabecalho();
-		((FrmCompra)frm).load();		
+		((FrmCompra) frm).limparCabecalho();
+		((FrmCompra) frm).load();
+		// ((FrmCompra)frm).setAcao(Constantes.ACAO_ALTERAR);
 		frm.setEntidade(entidade);
 		this.exibir(frm);
-		((FrmCompra)frm).checaStatus();
+		((FrmCompra) frm).checaStatus();
 
 	}
-
 
 }

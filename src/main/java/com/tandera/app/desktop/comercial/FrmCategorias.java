@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,12 +19,10 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.tandera.app.desktop.cadastro.FrmPessoas;
-import com.tandera.app.desktop.orcamento.FrmCompra;
 import com.tandera.app.spring.SpringDesktopApp;
 import com.tandera.core.dao.springjpa.CategoriaRepository;
-import com.tandera.core.model.cadastro.Pessoa;
 import com.tandera.core.model.comercial.Categoria;
+import com.tandera.core.util.Constantes;
 
 import edu.porgamdor.util.desktop.Formulario;
 import edu.porgamdor.util.desktop.FormularioConsulta;
@@ -52,7 +51,14 @@ public class FrmCategorias extends FormularioConsulta {
 
 	private SSBotao cmdIncluir = new SSBotao();
 	private SSBotao cmdAlterar = new SSBotao();
-	private SSBotao cmdFechar = new SSBotao();
+	private final SSBotao cmdExcluir = new SSBotao();
+	//private SSBotao cmdFechar = new SSBotao();
+	
+	private String acao; // NOVO | ALTERAR | EXCLUIR | CONSULTAR
+	
+	public void setAcao(String acao) {
+		this.acao = acao;
+	}
 
 	public FrmCategorias() {
 		// JA PODERIA VIR DE FormularioConsulta
@@ -77,6 +83,7 @@ public class FrmCategorias extends FormularioConsulta {
 		cmdIncluir.setText("Incluir");
 		cmdIncluir.setIcone("novo");
 		cmdAlterar.setText("Alterar");
+		cmdExcluir.setText("Excluir");
 		cmdFechar.setText("Fechar");
 		txtFiltro.setColunas(30);
 	}
@@ -86,12 +93,21 @@ public class FrmCategorias extends FormularioConsulta {
 		// BASICAMENTE O QUE VC TERÁ QUE MUDAR ENTRE FORMULARIOS
 		tabela.getModeloTabela().addColumn("Id");
 		tabela.getModeloTabela().addColumn("Descrição");
+		tabela.getModeloTabela().addColumn("Deposito");
+		tabela.getModeloTabela().addColumn("Troca");
+		tabela.getModeloTabela().addColumn("Doação");
 
 		tabela.getModeloColuna().getColumn(0).setPreferredWidth(30);
-		tabela.getModeloColuna().getColumn(1).setPreferredWidth(320);
+		tabela.getModeloColuna().getColumn(1).setPreferredWidth(200);
+		tabela.getModeloColuna().getColumn(2).setPreferredWidth(50);
+		tabela.getModeloColuna().getColumn(3).setPreferredWidth(50);
+		tabela.getModeloColuna().getColumn(4).setPreferredWidth(50);
 
 		tabela.getModeloColuna().setCampo(0, "id");
 		tabela.getModeloColuna().setCampo(1, "descr");
+		tabela.getModeloColuna().setCampo(2, "fatorDeposito");
+		tabela.getModeloColuna().setCampo(3, "fatorTroca");
+		tabela.getModeloColuna().setCampo(4, "fatorDoacao");
 
 	}
 
@@ -126,6 +142,7 @@ public class FrmCategorias extends FormularioConsulta {
 
 		getRodape().add(cmdIncluir);
 		getRodape().add(cmdAlterar);
+		getRodape().add(cmdExcluir);
 		getRodape().add(cmdFechar);
 	}
 
@@ -151,13 +168,20 @@ public class FrmCategorias extends FormularioConsulta {
 				alterar();
 			}
 		});
+		cmdExcluir.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				excluirItem();
+			}
+		});
 	}
 
 	public JPanel getFiltro() {
 		return filtro;
 	}
 
-	private void sair() {
+	@Override
+	protected void sair() {
 		super.fechar();
 	}
 
@@ -185,7 +209,8 @@ public class FrmCategorias extends FormularioConsulta {
 		exibirCadastro(null);
 	}
 
-	private void alterar() {
+	@Override
+	protected void alterar() {
 		Categoria entidade = (Categoria) tabela.getLinhaSelecionada();
 		if (entidade == null) {
 			SSMensagem.avisa("Selecione um item da lista");
@@ -193,7 +218,24 @@ public class FrmCategorias extends FormularioConsulta {
 		}
 		exibirCadastro(entidade);
 	}
+	
+	private void excluirItem() {
+		Categoria categoria = (Categoria) tabela.getLinhaSelecionada();
+		if (categoria == null) {
+			SSMensagem.avisa("Selecione um item da lista");
+			return;
+		}
 
+		if (SSMensagem.confirma("Confirma exclusão do Registro (" + categoria.getId() + "-"
+				+ categoria.getDescr() + ")?")) {
+			this.acao = Constantes.ACAO_EXCLUSAO;
+			dao.deleteItemCategoria(categoria.getId());
+			SSMensagem.informa("Item Excluido com sucesso!!");
+			listar();
+		}
+
+	}
+	
 	private void exibirCadastro(Categoria entidade) {
 		Formulario frm = SpringDesktopApp.getBean(formInclusao);
 		frm.setEntidade(entidade);

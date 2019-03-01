@@ -20,7 +20,9 @@ import org.springframework.stereotype.Component;
 
 import com.tandera.app.spring.SpringDesktopApp;
 import com.tandera.core.dao.springjpa.TamanhoRepository;
+import com.tandera.core.model.comercial.Categoria;
 import com.tandera.core.model.comercial.Tamanho;
+import com.tandera.core.util.Constantes;
 
 import edu.porgamdor.util.desktop.Formulario;
 import edu.porgamdor.util.desktop.FormularioConsulta;
@@ -49,8 +51,13 @@ public class FrmTamanhos extends FormularioConsulta {
 		
 		private SSBotao cmdIncluir = new SSBotao();
 		private SSBotao cmdAlterar = new SSBotao();
-		private SSBotao cmdFechar = new SSBotao();
-
+		private final SSBotao cmdExcluir = new SSBotao();
+		
+		private String acao; // NOVO | ALTERAR | EXCLUIR | CONSULTAR
+		
+		public void setAcao(String acao) {
+			this.acao = acao;
+		}
 		
 		public FrmTamanhos() {
 			//JA PODERIA VIR DE FormularioConsulta
@@ -75,6 +82,7 @@ public class FrmTamanhos extends FormularioConsulta {
 			cmdIncluir.setText("Incluir");
 			cmdIncluir.setIcone("novo");
 			cmdAlterar.setText("Alterar");
+			cmdExcluir.setText("Excluir");
 			cmdFechar.setText("Fechar");
 			txtFiltro.setColunas(30);	
 		}
@@ -87,7 +95,7 @@ public class FrmTamanhos extends FormularioConsulta {
 			tabela.getModeloTabela().addColumn("Sigla");
 			
 			tabela.getModeloColuna().getColumn(0).setPreferredWidth(30);
-			tabela.getModeloColuna().getColumn(1).setPreferredWidth(250);
+			tabela.getModeloColuna().getColumn(1).setPreferredWidth(280);
 			tabela.getModeloColuna().getColumn(2).setPreferredWidth(70);
 			
 			tabela.getModeloColuna().setCampo(0, "id");
@@ -127,6 +135,7 @@ public class FrmTamanhos extends FormularioConsulta {
 			
 			getRodape().add(cmdIncluir);
 			getRodape().add(cmdAlterar);
+			getRodape().add(cmdExcluir);
 			getRodape().add(cmdFechar);
 		}
 		
@@ -152,12 +161,19 @@ public class FrmTamanhos extends FormularioConsulta {
 					alterar();
 				}
 			});
+			cmdExcluir.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					excluirItem();
+				}
+			});
 		}
 		
 		public JPanel getFiltro() {
 			return filtro;
 		}
-		private void sair() {
+		@Override
+		protected void sair() {
 			super.fechar();
 		}
 		private void listar() {
@@ -182,7 +198,9 @@ public class FrmTamanhos extends FormularioConsulta {
 		private void incluir() {
 			exibirCadastro(null);
 		}
-		private void alterar() {
+		
+		@Override
+		protected void alterar() {
 			Tamanho entidade= (Tamanho) tabela.getLinhaSelecionada();
 			if(entidade==null) {
 				SSMensagem.avisa("Selecione um item da lista");
@@ -190,6 +208,24 @@ public class FrmTamanhos extends FormularioConsulta {
 			}
 			exibirCadastro(entidade);
 		}
+		
+		private void excluirItem() {
+			Tamanho tamanho = (Tamanho) tabela.getLinhaSelecionada();
+			if (tamanho == null) {
+				SSMensagem.avisa("Selecione um item da lista");
+				return;
+			}
+
+			if (SSMensagem.confirma("Confirma exclusão do Registro (" + tamanho.getId() + "-"
+					+ tamanho.getDescr() + ")?")) {
+				this.acao = Constantes.ACAO_EXCLUSAO;
+				dao.deleteItemCategoria(tamanho.getId());
+				SSMensagem.informa("Item Excluido com sucesso!!");
+				listar();
+			}
+
+		}
+		
 		private void exibirCadastro(Tamanho entidade) {
 			Formulario frm = SpringDesktopApp.getBean(FrmTamanho.class);
 			frm.setEntidade(entidade);
