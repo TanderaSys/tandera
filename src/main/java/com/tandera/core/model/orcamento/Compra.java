@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,6 +25,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tandera.core.model.cadastro.Pessoa;
 import com.tandera.core.model.enuns.SimNao;
@@ -94,6 +95,7 @@ public class Compra implements Serializable {
 	
 	@OneToMany(mappedBy = "compra", fetch=FetchType.EAGER, cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<ItemCompra>itemCompra = new ArrayList<ItemCompra>(); 
+ 
 	
 	@Enumerated(EnumType.STRING)
 	private SimNao consignado;

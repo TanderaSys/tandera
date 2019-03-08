@@ -55,6 +55,7 @@ public class PersistenceConfig {
 		dataSource.setUrl(getValue(Ambiente.DB_URL));
 		dataSource.setUsername(getValue(Ambiente.DB_USER));
 		dataSource.setPassword(getValue(Ambiente.DB_PASS));
+	
 		return dataSource;
 	}
 	
@@ -64,7 +65,8 @@ public class PersistenceConfig {
 		properties.put(AvailableSettings.DIALECT, getValue(Ambiente.DB_DIALECT));
 		properties.put(AvailableSettings.SHOW_SQL, getValue(Ambiente.DB_SHOWSQL));
 		properties.put(AvailableSettings.FORMAT_SQL,true);
-
+		//properties.put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, true);
+		//hibernate.enable_lazy_load_no_trans
 		return properties;
 	}
 	
